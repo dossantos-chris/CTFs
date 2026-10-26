@@ -1,0 +1,2 @@
+gets with no bound check at ropme+249 
+offset - 0x74 + 0x4

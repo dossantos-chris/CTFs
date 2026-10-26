@@ -1,0 +1,22 @@
+base class does not define a virtual destructor, which leads to undefined behavior
+
+need to somehow overwrite the vtable with the address of vtable-8 so that when it tries to dereference vtable+8 for introduce, it actually calls give_shell
+
+Human object is 0x40 (64) bytes allocated on the heap, meaning the actual allocation size was likely 0x30 (48) bytes because this includes header metadata which is 16 bytes
+
+created a 48 byte file containing the win address 6 times
+
+noticed that it was picking the second heap block which belonged to Woman, which caused a crash because Man tried to dereference their vtable first
+
+switched to a 96 byte file and tried a heap size of 96 (0x80 (total size) - 0x20 (metadata size))
+
+this did not work because tcache does not combine free chunks
+
+realized i could literally just allocate 2 blocks of size 48 and it worked
+
+0x404d78 - address we want to write
+0x404d80 - base Man vtable address
+0x404d88 - Man::introduce address
+0x404d60 - base Woman vtable address
+0x404d68 - Woman::introduce address
+0x40295e - Human::give_shell address

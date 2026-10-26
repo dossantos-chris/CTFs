@@ -1,0 +1,15 @@
+the program starts by calling the first 4 bytes of argv[0]
+
+we can provide an arbitrary address to argv[0] so that our program can continue execution
+
+NX is disabled so we can freely inject shellcode into the stack through argv and env
+
+actual payload is giant nopsleds spanning multiple pages to maximize our chance of landing in our shellcode due to aslr
+
+max arg/env size is 128 kb, 2mb for total of all args and env
+
+inject 10 payloads into env, 5 into argv to maximize our chance of a hit (about 1.5mb)
+
+ran the program a couple times with gdb and picked an arbitrary stack address to test on
+
+heap/stack spraying is more viable on 32 bit arch because of the reduced address space onyl being 2^32 as opposed to 2^64

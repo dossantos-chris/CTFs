@@ -1,0 +1,32 @@
+copying argv[1] into a 20 byte buffer 
+
+basic stack overflow, we can input way more than 20 bytes 
+
+restriction is that our full payload must be ascii only
+
+ascii only payload is not really possible also NX is enabled
+
+we load libc as executable at a fixed offset so it looks like we can find some code inside there to jump to (libc offset - 0x5555e000)
+
+ended up constructing a ropchain for an execve call consisting of:
+
+padding
+execve jump address
+arbitrary string address
+nullptr address
+nullptr address
+
+call_execve = 0x55616967
+string_tag = 0x556b6544
+null = 0x556b486c
+
+first, scanned libc for a valid (ascii-only) execve call address
+
+next, found a valid address of a null-terminated string
+
+finally, found a valid nullptr address
+
+before we execute our script we have to create a symbolic in our temp directory to the name of the arbitrary string we chose (mine was "tag") and update our path variable
+
+ln -s /bin/sh tag
+PATH=$PATH:/tmp/*tmpname*

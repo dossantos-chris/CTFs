@@ -1,0 +1,11 @@
+movdqa and movntps instructions both require 16 byte alignment (last nibble to be 0)
+
+movdqa is being used on src which is allocated by mmap, meaning it will be default page aligned 4096 (0x1000) bytes
+
+so the problem then becomes alignment for dest, which is being allocated by malloc
+
+this implementation of malloc seems to only guarantee 8 byte alignment, so we must find input sizes that will give us 0 as the last nibble
+
+can basically bruteforce this by just adding 8 to the previous allocation sizes
+
+sizes - 8 16 32 72 136 266 520 1032 2056 5004

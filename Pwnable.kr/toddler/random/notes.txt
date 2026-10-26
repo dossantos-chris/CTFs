@@ -1,0 +1,2 @@
+rand - 0x6b8b4567
+rand ^ 0xcafebabe = -1586102311

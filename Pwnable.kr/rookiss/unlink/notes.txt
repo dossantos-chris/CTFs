@@ -1,0 +1,44 @@
+double linked list - A <-> B <-> C
+after unlink - A <-> C 
+
+each node is 16 bytes ptr + ptr + 8 byte buf
+
+we can use gets to overflow the heap starting at the buffer of A
+
+0x99819b0 - start of A
+0x99819c0 - start of As buffer
+24 bytes after As buffer is the start of B
+56 bytes after As buffer is the start of C
+
+we can set BK and FD to abritrary addresses by overwriting B with gets
+
+we need to get BK to be stack leak - offset to rbp
+
+FD needs to then be the address to shell()
+
+so therefore we need to use gets to write the stack ret address into B.bk and the shell() address into B.fd
+
+address of fd is 24 bytes after gets buffer
+address of bk is 28 bytes after gets buffer
+
+0x080491d6 - shell address
+0x14 - stack address offset
+
+we cannot directly embed the shell address in B because it will cause a segfault from attempting to write to the text segment
+
+instead we can use the heap leak to redirect execution
+
+i first tried to just overwrite the return address on the stack in main with the heap leak address + 8 (beginning of the buffer), which i wrote the shell address to
+
+this did not work because ret pops the heap address which contains the shell address in eip, not the actual shell address, so it tries to execute on the heap and crashes 
+
+at the end of main a value on stack is popped into ecx and then ecx - 4 is loaded into esp right before the ret
+
+we can overwrite the address that gets popped into ecx with 4 bytes past the beginning of our buffer (which contains the shell address) because ecx - 4 gets loaded directly into esp
+
+this makes it so that the ret dereferences esp, which will be our buffer on the stack containing the shell address
+
+stack offset - 0x8 (12 bytes til the ecx value but we write to that addr + 4 in unlink)
+
+heap offset - 0xc (8 bytes til start of buffer + 4 extra because we are referencing [ecx - 4])
+
